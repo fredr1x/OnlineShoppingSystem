@@ -11,6 +11,4 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
-
-debug: true
+      ddl-auto: validate

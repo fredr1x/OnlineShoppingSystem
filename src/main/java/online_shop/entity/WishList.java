@@ -1,9 +1,10 @@
 package online_shop.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.time.Instant;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
@@ -19,14 +20,7 @@ public class WishList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
-
-    @Column(name = "added_at", nullable = false)
-    private Instant addedAt;
 }
