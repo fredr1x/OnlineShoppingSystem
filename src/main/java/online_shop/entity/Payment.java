@@ -2,6 +2,8 @@ package online_shop.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import online_shop.entity.enums.PaymentMethod;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -23,7 +25,7 @@ public class Payment {
     private Order order;
 
     @Column(name = "payment_method", nullable = false, length = 64)
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
 
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
