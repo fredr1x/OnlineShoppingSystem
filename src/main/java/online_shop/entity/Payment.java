@@ -24,7 +24,8 @@ public class Payment {
     @JoinColumn(name = "order_id", unique = true)
     private Order order;
 
-    @Column(name = "payment_method", nullable = false, length = 64)
+    @Column(name = "payment_method", nullable = false)
+    @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
     @Column(name = "amount", nullable = false)
