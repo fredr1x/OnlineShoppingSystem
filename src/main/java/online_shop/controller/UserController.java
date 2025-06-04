@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/users")
@@ -38,7 +40,7 @@ public class UserController {
 
         var user = userMapper.toEntity(userDto);
         user.setRole(Role.ROLE_USER);
-
+        user.setRegisteredAt(Instant.now());
         var saved = userRepository.save(user);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
