@@ -9,6 +9,8 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
     enabled: true
 
+
   jpa:
     hibernate:
       ddl-auto: validate
+    show-sql: true
