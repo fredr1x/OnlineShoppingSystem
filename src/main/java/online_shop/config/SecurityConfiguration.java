@@ -60,6 +60,8 @@ public class SecurityConfiguration {
                                 .permitAll()
                                 .requestMatchers("/v3/api-docs/**")
                                 .permitAll()
+                                .requestMatchers("/login.html", "/register.html", "static/**", "css/**", "js/**")
+                                .permitAll()
                                 .anyRequest().authenticated())
                 .anonymous(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider),

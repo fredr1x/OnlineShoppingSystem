@@ -54,15 +54,17 @@ public class User {
             cascade = CascadeType.ALL, orphanRemoval = true)
     private WishList wishList;
 
+    @Builder.Default
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "user",
             cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRoles> userRoles = new HashSet<>();
 
-
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user",
             cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviewList = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user",
             cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();

@@ -10,6 +10,8 @@ import online_shop.entity.enums.RoleValue;
 import online_shop.exception.EmailAlreadyUsedException;
 import online_shop.exception.UserNotFoundException;
 import online_shop.mapper.UserMapper;
+import online_shop.repository.RoleRepository;
+import online_shop.repository.UserRolesRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,8 +26,10 @@ public class AuthenticationService {
 
     private final UserMapper userMapper;
     private final UserService userService;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRolesRepository userRolesRepository;
     private final AuthenticationManager authenticationManager;
 
 
@@ -60,11 +64,14 @@ public class AuthenticationService {
 
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
+        var role = roleRepository.findUserRole();
+
         var userRoles = UserRoles.builder()
                 .user(user)
-                .role(Role.builder().roleValue(RoleValue.ROLE_USER).build())
+                .role(role)
                 .build();
 
+        userRolesRepository.save(userRoles);
         user.setRole(userRoles);
         user.setRegisteredAt(Instant.now());
 
