@@ -7,6 +7,7 @@ import online_shop.exception.EmailAlreadyUsedException;
 import online_shop.exception.UserNotFoundException;
 import online_shop.mapper.UserMapper;
 import online_shop.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.time.Instant;
 @Transactional(readOnly = true)
 public class UserService {
 
+    private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final UserRepository userRepository;
 
@@ -33,6 +35,7 @@ public class UserService {
 
         if (userRepository.existsByEmail(userDto.getEmail())) throw new EmailAlreadyUsedException("Email: " + userDto.getEmail() + " is already in use");
 
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setRole(Role.ROLE_USER);
         user.setRegisteredAt(Instant.now());
 
