@@ -33,4 +33,15 @@ public class UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
     }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+
+
+    @Transactional
+    public User save(User user) {
+        return userRepository.save(user);
+    }
 }
