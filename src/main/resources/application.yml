@@ -14,3 +14,9 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: true
+
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    access: 3600000
+    refresh: 2592000000

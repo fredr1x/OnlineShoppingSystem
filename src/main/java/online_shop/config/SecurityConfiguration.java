@@ -2,6 +2,8 @@ package online_shop.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import online_shop.security.JwtTokenFilter;
+import online_shop.service.JwtTokenProvider;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +14,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +27,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
 
     private final ApplicationContext applicationContext;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
     @SneakyThrows
@@ -59,9 +61,9 @@ public class SecurityConfiguration {
                                 .requestMatchers("/v3/api-docs/**")
                                 .permitAll()
                                 .anyRequest().authenticated())
-                .anonymous(AbstractHttpConfigurer::disable);
-                //.addFilterBefore(new JwtTokenFilter(tokenProvider),
-                  //      UsernamePasswordAuthenticationFilter.class);
+                .anonymous(AbstractHttpConfigurer::disable)
+                .addFilterBefore(new JwtTokenFilter(jwtTokenProvider),
+                        UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }
