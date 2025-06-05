@@ -22,13 +22,4 @@ public class UserController {
     public UserDto findUserById(@PathVariable("id") Long id) throws UserNotFoundException {
         return userService.findUserById(id);
     }
-
-    @PostMapping("/")
-    public ResponseEntity<UserDto> registerUser(@RequestBody @Validated(OnCreate.class) UserDto userDto) throws EmailAlreadyUsedException {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(userService.registerUser(userDto));
-    }
-
-
 }

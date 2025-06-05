@@ -2,11 +2,12 @@ package online_shop.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import online_shop.entity.enums.Role;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -36,10 +37,6 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "role", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Role role;
-
     @Column(name = "registered_at")
     private Instant registeredAt;
 
@@ -57,6 +54,11 @@ public class User {
             cascade = CascadeType.ALL, orphanRemoval = true)
     private WishList wishList;
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user",
+            cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserRoles> userRoles = new HashSet<>();
+
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user",
             cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviewList = new ArrayList<>();
@@ -65,13 +67,18 @@ public class User {
             cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
 
-//    public void setReview(Review review) {
-//        reviewList.add(review);
-//        review.setUser(this);
-//    }
-//
-//    public void setOrder(Order order) {
-//        orders.add(order);
-//        order.setUser(this);
-//    }
+    public void setRole(UserRoles role) {
+        userRoles.add(role);
+        role.setUser(this);
+    }
+
+    public void setReview(Review review) {
+        reviewList.add(review);
+        review.setUser(this);
+    }
+
+    public void setOrder(Order order) {
+        orders.add(order);
+        order.setUser(this);
+    }
 }
