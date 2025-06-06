@@ -15,6 +15,24 @@ spring:
       ddl-auto: validate
     show-sql: true
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 99082760965-i0tpf59u1sgqh1qd7h69ueuohctd6d2v.apps.googleusercontent.com
+            client-secret: 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
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - email
+              - profile
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: sub
+
 security:
   jwt:
     secret: ${JWT_SECRET}
