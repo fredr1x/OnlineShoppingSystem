@@ -16,23 +16,6 @@
         <relativePath/>
     </parent>
 
-    <url/>
-
-    <licenses>
-        <license/>
-    </licenses>
-
-    <developers>
-        <developer/>
-    </developers>
-
-    <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
-    </scm>
-
     <properties>
         <java.version>20</java.version>
         <postgresql.version>42.7.6</postgresql.version>
@@ -72,6 +55,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
 
