@@ -1,7 +1,6 @@
 package online_shop.entity;
 
 import jakarta.persistence.*;
-import liquibase.change.DatabaseChangeNote;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
