@@ -1,0 +1,3 @@
+ALTER TABLE products
+ALTER COLUMN rating
+TYPE REAL

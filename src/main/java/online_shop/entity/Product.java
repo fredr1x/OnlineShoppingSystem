@@ -40,7 +40,7 @@ public class Product {
     private String imagePath;
 
     @Column(name = "rating")
-    private Integer rating;
+    private Float rating;
 
     @Column(name = "created_at")
     private Instant createdAt;
