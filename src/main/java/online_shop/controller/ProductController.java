@@ -27,8 +27,8 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.getTop10Products());
     }
 
-    @GetMapping("/{category}")
-    public ResponseEntity<List<ProductDto>> getAllProductsByCategory(@PathVariable @Validated ProductCategoryDto category) {
+    @GetMapping("/category")
+    public ResponseEntity<List<ProductDto>> getAllProductsByCategory(@RequestBody @Validated ProductCategoryDto category) {
         return ResponseEntity.ok().body(productService.getAllProductsByCategory(category));
     }
 

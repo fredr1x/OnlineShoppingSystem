@@ -2,8 +2,10 @@ package online_shop.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import online_shop.entity.enums.Category;
 import online_shop.validation.OnCreate;
 import online_shop.validation.OnUpdate;
@@ -13,6 +15,8 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductDto {
 
     @NotNull(message = "id must be not null", groups = OnUpdate.class)

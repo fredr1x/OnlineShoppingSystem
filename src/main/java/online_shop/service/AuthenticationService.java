@@ -34,7 +34,13 @@ public class AuthenticationService {
     public JwtResponse login(JwtRequest loginRequest) throws UserNotFoundException {
         JwtResponse jwtResponse = new JwtResponse();
         var authentication = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
-        authenticationManager.authenticate(authentication);
+
+        try {
+            authenticationManager.authenticate(authentication);
+        } catch (Exception e) {
+            throw new RuntimeException("Authentication failed: " + e.getMessage(), e);
+        }
+
 
         var user = userService.getUserByEmail(loginRequest.getEmail());
 

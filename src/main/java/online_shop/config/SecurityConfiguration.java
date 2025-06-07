@@ -39,11 +39,7 @@ public class SecurityConfiguration {
                 .cors(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(sessionManagement ->
-                        sessionManagement
-                                .sessionCreationPolicy(
-                                        SessionCreationPolicy.STATELESS
-                                )
-                )
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(configurer ->
                         configurer.authenticationEntryPoint(
                                         (request, response, exception) -> {

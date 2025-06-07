@@ -50,10 +50,10 @@ public class ProductService {
     public List<ProductDto> getAllProductsByCategory(ProductCategoryDto category) {
         return productMapper
                 .toDto(productRepository
-                .findByCategory(Category.valueOf(String.valueOf(category))));
+                .findByCategory(Category.valueOf(category.getCategory().toUpperCase())));
     }
 
     public List<ProductDto> getTop10Products() {
-        return productRepository.getTop10Products();
+        return productMapper.toDto(productRepository.getTop10Products());
     }
 }

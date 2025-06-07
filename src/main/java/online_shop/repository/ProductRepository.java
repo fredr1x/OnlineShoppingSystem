@@ -15,5 +15,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategory(Category category);
 
     @Query("select p from Product p order by p.rating desc limit 10")
-    List<ProductDto> getTop10Products();
+    List<Product> getTop10Products();
 }
