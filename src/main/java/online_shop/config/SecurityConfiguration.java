@@ -60,7 +60,7 @@ public class SecurityConfiguration {
                                 .permitAll()
                                 .requestMatchers("/v3/api-docs/**")
                                 .permitAll()
-                                .requestMatchers("/login.html", "/register.html", "static/**", "css/**", "js/**")
+                                .requestMatchers("/login.html", "/register.html", "/static/**", "css/**", "js/**", "/styles.css", "/login.js")
                                 .permitAll()
                                 .anyRequest().authenticated())
                 .anonymous(AbstractHttpConfigurer::disable)
