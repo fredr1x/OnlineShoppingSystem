@@ -1,6 +1,5 @@
 package online_shop.service;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import online_shop.entity.User;
@@ -27,12 +26,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     }
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         OAuth2AuthenticationToken auth2Authentication = (OAuth2AuthenticationToken) authentication;
 
         String email = auth2Authentication.getPrincipal().getAttribute("email");
 
-        User user = null;
+        User user;
         try {
             user = userService.getUserByEmail(email);
         } catch (UserNotFoundException e) {
