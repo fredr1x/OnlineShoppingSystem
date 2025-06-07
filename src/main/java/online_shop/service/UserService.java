@@ -57,6 +57,6 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
 
 
-        user.se
+        return null;
     }
 }
