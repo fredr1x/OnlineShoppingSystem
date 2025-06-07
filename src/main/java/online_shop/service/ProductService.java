@@ -56,11 +56,11 @@ public class ProductService {
            }
 
            if (minPrice != null) {
-               predicates.add(cb.greaterThanOrEqualTo(root.get("minPrice"), minPrice));
+               predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
            }
 
            if (maxPrice != null) {
-               predicates.add(cb.lessThanOrEqualTo(root.get("maxPrice"), maxPrice));
+               predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
            }
 
            if (category != null) {
