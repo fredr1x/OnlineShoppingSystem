@@ -8,14 +8,17 @@ import online_shop.dto.UserUpdateRolesDto;
 import online_shop.entity.Role;
 import online_shop.entity.User;
 import online_shop.entity.UserRoles;
+import online_shop.entity.enums.RoleValue;
 import online_shop.exception.PasswordConfirmationException;
 import online_shop.exception.UserNotFoundException;
 import online_shop.mapper.UserMapper;
+import online_shop.repository.RoleRepository;
 import online_shop.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -28,6 +31,7 @@ public class UserService {
 
     private final UserMapper userMapper;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UserDto findUserById(Long id) throws UserNotFoundException {
@@ -69,12 +73,13 @@ public class UserService {
         Set<UserRoles> roles = userDto.getRoles().stream()
                 .map(role -> UserRoles.builder()
                         .user(user)
-                        .role(Role.builder().roleValue(role).build())
+                        .role(roleRepository.findRole(role))
                         .build())
                 .collect(Collectors.toSet());
 
         user.getUserRoles().clear();
         user.getUserRoles().addAll(roles);
+        user.setModifiedAt(Instant.now());
 
         return userMapper.toDto(userRepository.save(user));
     }
@@ -90,9 +95,11 @@ public class UserService {
         if (!passwordEncoder.matches(userDto.getOldPassword(), user.getPassword())) throw new PasswordConfirmationException("Failed password confirmation");
 
         user.setPassword(passwordEncoder.encode(userDto.getNewPassword()));
+        user.setModifiedAt(Instant.now());
         return userMapper.toDto(userRepository.save(user));
     }
 
+    @Transactional
     public UserDto update(UserUpdateDto userDto) throws UserNotFoundException {
 
         var user = userRepository.findById(userDto.getId())
@@ -100,6 +107,7 @@ public class UserService {
 
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
+        user.setModifiedAt(Instant.now());
 
         return userMapper.toDto(userRepository.save(user));
     }
