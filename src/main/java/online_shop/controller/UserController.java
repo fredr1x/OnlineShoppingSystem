@@ -2,10 +2,15 @@ package online_shop.controller;
 
 import lombok.RequiredArgsConstructor;
 import online_shop.dto.UserDto;
+import online_shop.dto.UserPasswordChangeDto;
 import online_shop.dto.UserUpdateDto;
+import online_shop.dto.UserUpdateRolesDto;
+import online_shop.exception.PasswordConfirmationException;
 import online_shop.exception.UserNotFoundException;
 import online_shop.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,12 +35,20 @@ public class UserController {
         return userService.findAllUsers();
     }
 
-    @PutMapping("/admin/update/{id}")
-    public UserDto updateUser(@PathVariable("id") Long id, @RequestBody UserUpdateDto userDto) throws UserNotFoundException {
+    @PatchMapping("/admin/update/{id}")
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<UserDto> updateUserRole(@PathVariable("id") Long id, @RequestBody @Validated UserUpdateRolesDto userDto) throws UserNotFoundException {
+        if (!Objects.equals(id, userDto.getId())) throw new IllegalArgumentException("IDs must match");
+        return ResponseEntity.ok().body(userService.updateRoles(id, userDto));
+    }
 
-        assert Objects.equals(id, userDto.getId());
-        userService.update(id, userDto);
+    @PatchMapping("/change_password")
+    public ResponseEntity<UserDto> changePassword(@RequestBody @Validated UserPasswordChangeDto userDto) throws UserNotFoundException, PasswordConfirmationException {
+        return ResponseEntity.ok().body(userService.changePassword(userDto));
+    }
 
-        return null;
+    @PutMapping("/update")
+    public ResponseEntity<UserDto> updateUser(@RequestBody @Validated UserUpdateDto userDto) throws UserNotFoundException {
+        return ResponseEntity.ok().body(userService.update(userDto));
     }
 }

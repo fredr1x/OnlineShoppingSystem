@@ -2,16 +2,24 @@ package online_shop.service;
 
 import lombok.RequiredArgsConstructor;
 import online_shop.dto.UserDto;
+import online_shop.dto.UserPasswordChangeDto;
 import online_shop.dto.UserUpdateDto;
+import online_shop.dto.UserUpdateRolesDto;
+import online_shop.entity.Role;
 import online_shop.entity.User;
+import online_shop.entity.UserRoles;
+import online_shop.exception.PasswordConfirmationException;
 import online_shop.exception.UserNotFoundException;
 import online_shop.mapper.UserMapper;
 import online_shop.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +28,7 @@ public class UserService {
 
     private final UserMapper userMapper;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserDto findUserById(Long id) throws UserNotFoundException {
         var user = userRepository.findById(id)
@@ -52,11 +61,46 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto update(Long id, UserUpdateDto userUpdateDto) throws UserNotFoundException {
+    public UserDto updateRoles(Long id, UserUpdateRolesDto userDto) throws UserNotFoundException {
+
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
 
+        Set<UserRoles> roles = userDto.getRoles().stream()
+                .map(role -> UserRoles.builder()
+                        .user(user)
+                        .role(Role.builder().roleValue(role).build())
+                        .build())
+                .collect(Collectors.toSet());
 
-        return null;
+        user.getUserRoles().clear();
+        user.getUserRoles().addAll(roles);
+
+        return userMapper.toDto(userRepository.save(user));
+    }
+
+    @Transactional
+    public UserDto changePassword(UserPasswordChangeDto userDto) throws UserNotFoundException, PasswordConfirmationException {
+
+        if (!Objects.equals(userDto.getOldPassword(), userDto.getOldPasswordConfirmation())) throw new PasswordConfirmationException("Failed password confirmation");
+
+        var user = userRepository.findById(userDto.getId())
+                .orElseThrow(() -> new UserNotFoundException("User with id: " + userDto.getId() + " not found"));
+
+        if (!passwordEncoder.matches(userDto.getOldPassword(), user.getPassword())) throw new PasswordConfirmationException("Failed password confirmation");
+
+        user.setPassword(passwordEncoder.encode(userDto.getNewPassword()));
+        return userMapper.toDto(userRepository.save(user));
+    }
+
+    public UserDto update(UserUpdateDto userDto) throws UserNotFoundException {
+
+        var user = userRepository.findById(userDto.getId())
+                .orElseThrow(() -> new UserNotFoundException("User with id: " + userDto.getId() + " not found"));
+
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+
+        return userMapper.toDto(userRepository.save(user));
     }
 }
