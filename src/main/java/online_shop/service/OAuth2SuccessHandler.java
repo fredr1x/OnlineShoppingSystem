@@ -31,18 +31,18 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         String email = auth2Authentication.getPrincipal().getAttribute("email");
 
-        User user;
+        User user = null;
         try {
             user = userService.getUserByEmail(email);
         } catch (UserNotFoundException e) {
-            throw new RuntimeException(e);
+            response.sendRedirect("/login.html");
         }
 
         if (user == null) {
             response.sendRedirect("/login.html");
-            return;
         }
 
+        assert user != null;
         var userId = user.getId();
         var userEmail = user.getEmail();
         var userRoles = user.getUserRoles();

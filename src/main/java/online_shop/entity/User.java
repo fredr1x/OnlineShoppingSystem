@@ -46,7 +46,7 @@ public class User {
     @Column(name = "profile_image_path")
     private String profileImagePath;
 
-    @OneToOne(fetch = FetchType.EAGER, mappedBy = "user",
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user",
             cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
 
