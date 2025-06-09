@@ -26,6 +26,9 @@ public class Cart {
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
 
+    @Column(name = "total_items", nullable = false)
+    private Integer totalItems;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
