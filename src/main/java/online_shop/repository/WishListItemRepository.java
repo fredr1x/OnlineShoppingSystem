@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface WishListItemRepository extends JpaRepository<WishListItem, Long> {
 
-    @Query("")
+    @Query("select wli from WishListItem wli where wli.wishList.id=:wishListId")
     List<WishListItem> getAllByWishListId(Long wishListId);
 }

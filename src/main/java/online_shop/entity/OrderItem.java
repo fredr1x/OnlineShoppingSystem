@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 
 @Data
 @Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "order_items")

@@ -2,6 +2,7 @@ package online_shop.repository;
 
 import online_shop.entity.CartItem;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -23,4 +24,8 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
 
     @Query("select sum(ci.id * ci.quantity) from CartItem ci where ci.cart.id=:cartId")
     Integer getTotalItems(Long cartId);
+
+    @Modifying
+    @Query("delete from CartItem ci where ci.cart.id=:cartId")
+    void deleteAllByCartId(Long cartId);
 }

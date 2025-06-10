@@ -1,6 +1,7 @@
 package online_shop.entity.enums;
 
 public enum PaymentMethod {
+    SYSTEM,
     CREDIT_CARD,
     PAYPAL,
     APPLE_PAY,

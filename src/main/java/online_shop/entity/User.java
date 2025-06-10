@@ -3,6 +3,7 @@ package online_shop.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -42,6 +43,9 @@ public class User {
 
     @Column(name = "modified_at")
     private Instant modifiedAt;
+
+    @Column(name = "balance", nullable = false)
+    private BigDecimal balance;
 
     @Column(name = "profile_image_path")
     private String profileImagePath;
