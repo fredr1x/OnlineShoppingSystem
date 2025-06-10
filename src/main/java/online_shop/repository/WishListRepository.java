@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WishListRepository extends JpaRepository<WishList, Integer> {
 
+    WishList findById(Long id);
+    WishList findByUserId(Long userId);
 }
