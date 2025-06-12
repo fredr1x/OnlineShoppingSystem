@@ -1,7 +1,6 @@
 package online_shop.controller;
 
 import lombok.RequiredArgsConstructor;
-import online_shop.dto.ProductIdRequest;
 import online_shop.dto.ReviewDeleteRequest;
 import online_shop.dto.ReviewDto;
 import online_shop.dto.ReviewWithRating;
@@ -9,11 +8,8 @@ import online_shop.exception.*;
 import online_shop.service.ReviewService;
 import online_shop.validation.OnCreate;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
