@@ -1,10 +1,11 @@
 package online_shop.controller;
 
 import lombok.RequiredArgsConstructor;
-import online_shop.dto.*;
-import online_shop.exception.InsufficientFundsException;
-import online_shop.exception.OrderNotFoundException;
-import online_shop.exception.UserNotFoundException;
+import online_shop.dto.OrderDto;
+import online_shop.dto.OrderIdRequest;
+import online_shop.dto.OrderRequestDto;
+import online_shop.dto.UserIdRequest;
+import online_shop.exception.*;
 import online_shop.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -30,13 +31,20 @@ public class OrderController {
     }
 
     @PostMapping("/make_order")
-    public ResponseEntity<OrderDto> makeOrder(@RequestBody @Validated OrderRequestDto orderRequestDto) {
+    public ResponseEntity<OrderDto> makeOrder(@RequestBody @Validated OrderRequestDto orderRequestDto) throws IllegalAccessException, CartIsEmptyException, IdMismatchException, UserNotFoundException {
         return ResponseEntity.ok().body(orderService.makeOrder(orderRequestDto));
     }
 
     @PostMapping("/{orderId}/pay")
-    public ResponseEntity<OrderDto> payOrder(@RequestBody @Validated UserIdRequest userIdRequest, @PathVariable("orderId")  Long orderId) throws OrderNotFoundException, UserNotFoundException, InsufficientFundsException {
+    public ResponseEntity<OrderDto> payOrder(@RequestBody @Validated UserIdRequest userIdRequest, @PathVariable("orderId") Long orderId) throws OrderNotFoundException, UserNotFoundException, InsufficientFundsException, IdMismatchException {
         return ResponseEntity.ok().body(orderService.payOrder(userIdRequest.getId(), orderId));
     }
+
+    @DeleteMapping("/{orderId}/cancel_order")
+    public ResponseEntity<List<OrderDto>> cancelOrder(@PathVariable("orderId") Long orderId, @RequestBody UserIdRequest userIdRequest) throws OrderNotFoundException, UserNotFoundException, IdMismatchException, OrderAlreadyCancelledOrReturnedException {
+        orderService.cancelOrder(orderId, userIdRequest.getId());
+        return ResponseEntity.ok().body(orderService.getAllOrdersByUserId(userIdRequest.getId()));
+    }
+
 
 }

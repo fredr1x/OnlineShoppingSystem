@@ -7,12 +7,11 @@ import online_shop.dto.OrderRequestDto;
 import online_shop.entity.Order;
 import online_shop.entity.OrderItem;
 import online_shop.entity.Payment;
+import online_shop.entity.User;
 import online_shop.entity.enums.OrderStatus;
 import online_shop.entity.enums.PaymentMethod;
 import online_shop.entity.enums.PaymentStatus;
-import online_shop.exception.InsufficientFundsException;
-import online_shop.exception.OrderNotFoundException;
-import online_shop.exception.UserNotFoundException;
+import online_shop.exception.*;
 import online_shop.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +20,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,13 +35,25 @@ public class OrderService {
     private final OrderItemsRepository orderItemsRepository;
 
     @Transactional
-    public OrderDto makeOrder(OrderRequestDto orderRequestDto) {
+    public OrderDto makeOrder(OrderRequestDto orderRequestDto) throws CartIsEmptyException, IdMismatchException, UserNotFoundException {
 
-        var cart = cartRepository.findByUserId(orderRequestDto.getCartId());
+        var user = userRepository.findById(orderRequestDto.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("User with id:" + orderRequestDto.getUserId() + " not found"));
+
+        var cart = cartRepository.findByUserId(orderRequestDto.getUserId());
         var cartItems = cartItemRepository.findAllByCartId(cart.getId());
         var totalPrice = cartItemRepository.getTotalPrice(cart.getId());
 
+        if (!Objects.equals(cart.getUser().getId(), orderRequestDto.getUserId())) {
+            throw new IdMismatchException("ID's must match");
+        }
+
+        if (cartItems.isEmpty()) {
+            throw new CartIsEmptyException("Cart must contain at least one product to make order");
+        }
+
         var order = Order.builder()
+                .user(user)
                 .totalPrice(totalPrice)
                 .status(OrderStatus.PENDING)
                 .createdAt(Instant.now())
@@ -79,7 +91,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderDto payOrder(Long userId, Long orderId) throws OrderNotFoundException, UserNotFoundException, InsufficientFundsException {
+    public OrderDto payOrder(Long userId, Long orderId) throws OrderNotFoundException, UserNotFoundException, InsufficientFundsException, IdMismatchException {
 
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
@@ -89,7 +101,7 @@ public class OrderService {
 
         if (!Objects.equals(order.getUser().getId(), userId)
             && order.getStatus() != OrderStatus.PENDING) {
-            throw new IllegalArgumentException("User id mismatch");
+            throw new IdMismatchException("User id mismatch");
         }
 
         if (user.getBalance().compareTo(order.getTotalPrice()) < 0) {
@@ -176,5 +188,30 @@ public class OrderService {
         }
 
         return products;
+    }
+
+    @Transactional
+    public void cancelOrder(Long orderId, Long userId) throws OrderNotFoundException, IdMismatchException, UserNotFoundException, OrderAlreadyCancelledOrReturnedException {
+
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
+
+        var order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order with id: " + orderId + " not found"));
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new IdMismatchException("user id and orders user id mismatch");
+        }
+
+        if (order.getStatus().equals(OrderStatus.CANCELLED) ||
+            order.getStatus().equals(OrderStatus.RETURNED)) {
+            throw new OrderAlreadyCancelledOrReturnedException("Order with id: " + orderId + " is already cancelled or returned");
+        }
+
+        user.setBalance(user.getBalance().add(order.getTotalPrice()));
+        order.setStatus(OrderStatus.CANCELLED);
+
+        userRepository.save(user);
+        orderRepository.save(order);
     }
 }

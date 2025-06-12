@@ -83,6 +83,8 @@ public class JwtTokenProvider {
         User user = userService.getById(userId);
         jwtResponse.setId(userId);
         jwtResponse.setEmail(user.getEmail());
+        jwtResponse.setFirstName(user.getFirstName());
+        jwtResponse.setLastName(user.getLastName());
         jwtResponse.setAccessToken(
                 createAccessToken(userId, user.getEmail(), user.getUserRoles())
         );

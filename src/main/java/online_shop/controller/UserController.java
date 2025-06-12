@@ -51,4 +51,6 @@ public class UserController {
     public ResponseEntity<UserDto> updateUser(@RequestBody @Validated UserUpdateDto userDto) throws UserNotFoundException {
         return ResponseEntity.ok().body(userService.update(userDto));
     }
+
+    // todo add method for balance
 }

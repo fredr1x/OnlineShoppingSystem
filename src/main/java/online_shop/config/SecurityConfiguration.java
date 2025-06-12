@@ -58,12 +58,12 @@ public class SecurityConfiguration {
                                 .permitAll()
                                 .requestMatchers("/v3/api-docs/**")
                                 .permitAll()
-                                .requestMatchers("/login.html", "/register.html", "/static/**", "css/**", "js/**", "/styles.css", "/login.js")
+                                .requestMatchers("/login.html", "/register.html", "/static/**", "css/**", "js/**", "/styles.css", "/login.js", "/profile.html", "/profile.js", "/profile.css")
                                 .permitAll()
                                 .anyRequest().authenticated())
                 .anonymous(AbstractHttpConfigurer::disable)
                 .oauth2Login(oauth -> oauth
-                        .defaultSuccessUrl("/index.html", true)
+                        .defaultSuccessUrl("/profile.html", true)
                         .successHandler(oAuth2SuccessHandler))
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider),
                         UsernamePasswordAuthenticationFilter.class);

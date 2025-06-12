@@ -112,13 +112,15 @@ async function handleLogin(email, password) {
             // Store user data
             const userData = {
                 id: data.id,
-                email: data.email
+                email: data.email,
+                firstName: data.firstName,
+                lastName: data.lastName
             };
             localStorage.setItem('userData', JSON.stringify(userData));
 
             // Redirect after success message
             setTimeout(() => {
-                window.location.href = '/dashboard.html';
+                window.location.href = '/profile.html';
             }, 1500);
 
         } else {
