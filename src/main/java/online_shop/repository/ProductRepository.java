@@ -1,6 +1,5 @@
 package online_shop.repository;
 
-import online_shop.dto.ProductDto;
 import online_shop.entity.Product;
 import online_shop.entity.enums.Category;
 import org.springframework.data.jpa.repository.JpaRepository;

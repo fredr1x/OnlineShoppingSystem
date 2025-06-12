@@ -86,7 +86,7 @@ body {
 
 .profile-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 32px;
     margin-bottom: 32px;
 }
@@ -155,6 +155,39 @@ body {
     color: #059669;
 }
 
+/* Balance Card Styles */
+.balance-card .card-content {
+    text-align: center;
+}
+
+.balance-display {
+    margin-bottom: 32px;
+}
+
+.balance-amount {
+    font-size: 48px;
+    font-weight: 700;
+    color: #2eaadc;
+    margin-bottom: 8px;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+.balance-label {
+    font-size: 14px;
+    color: #787774;
+    font-weight: 500;
+}
+
+.balance-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-full {
+    width: 100%;
+}
+
 /* Buttons */
 .btn {
     padding: 10px 16px;
@@ -216,6 +249,28 @@ body {
 
 .btn-danger:hover {
     background-color: #b91c1c;
+}
+
+/* Amount buttons */
+.btn-amount {
+    background-color: #f7f7f5;
+    color: #37352f;
+    border: 1px solid #e9e9e7;
+    padding: 8px 16px;
+    font-size: 14px;
+    min-width: 60px;
+}
+
+.btn-amount:hover {
+    background-color: #2eaadc;
+    color: #ffffff;
+    border-color: #2eaadc;
+}
+
+.btn-amount.selected {
+    background-color: #2eaadc;
+    color: #ffffff;
+    border-color: #2eaadc;
 }
 
 /* Modal */
@@ -329,6 +384,38 @@ body {
     margin-top: 4px;
 }
 
+/* Amount input styling */
+.amount-input-wrapper {
+    position: relative;
+}
+
+.currency-symbol {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #787774;
+    font-weight: 500;
+    z-index: 1;
+}
+
+.amount-input {
+    padding-left: 32px;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-weight: 500;
+}
+
+.quick-amounts {
+    margin-bottom: 20px;
+}
+
+.amount-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+}
+
 .modal-actions {
     display: flex;
     gap: 12px;
@@ -401,7 +488,7 @@ body {
 /* Responsive design */
 @media (max-width: 1024px) {
     .profile-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 24px;
     }
 
@@ -415,6 +502,11 @@ body {
 }
 
 @media (max-width: 768px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
     .header-content {
         flex-direction: column;
         gap: 16px;
@@ -439,6 +531,10 @@ body {
         right: 16px;
         left: 16px;
         min-width: auto;
+    }
+
+    .amount-buttons {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -475,5 +571,9 @@ body {
 
     .modal-actions {
         flex-direction: column;
+    }
+
+    .balance-amount {
+        font-size: 36px;
     }
 }

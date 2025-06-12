@@ -6,6 +6,7 @@ import java.time.Instant;
 
 @Data
 @Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "reviews")

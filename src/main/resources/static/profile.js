@@ -52,7 +52,7 @@ class ProfileManager {
         document.getElementById('firstName').textContent = this.userData.firstName || '-';
         document.getElementById('lastName').textContent = this.userData.lastName || '-';
         document.getElementById('email').textContent = this.userData.email || '-';
-        document.getElementById('userId').textContent = this.userData.id || '-';
+        document.getElementById('balance').textContent = this.formatCurrency(this.userData.balance);
 
         // Update header display
         document.getElementById('displayName').textContent =
@@ -61,6 +61,17 @@ class ProfileManager {
 
         // Generate and display avatar initials
         this.updateAvatar();
+    }
+
+    formatCurrency(amount) {
+        // Ensure amount is a number
+        const numAmount = amount;
+
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        }).format(isNaN(numAmount) ? 0 : numAmount);
     }
 
     updateAvatar() {
@@ -104,6 +115,15 @@ class ProfileManager {
         if (changePasswordBtn) {
             changePasswordBtn.addEventListener('click', () => this.openChangePasswordModal());
         }
+
+        // Recharge buttons
+        const rechargeBtn = document.getElementById('rechargeBtn');
+        const rechargeActionBtn = document.getElementById('rechargeActionBtn');
+        [rechargeBtn, rechargeActionBtn].forEach(btn => {
+            if (btn) {
+                btn.addEventListener('click', () => this.openRechargeModal());
+            }
+        });
 
         // Modal close buttons
         this.setupModalEventListeners();
@@ -159,6 +179,39 @@ class ProfileManager {
                 }
             });
         }
+
+        // Recharge modal
+        const rechargeModal = document.getElementById('rechargeModal');
+        const closeRechargeModal = document.getElementById('closeRechargeModal');
+        const cancelRecharge = document.getElementById('cancelRecharge');
+
+        [closeRechargeModal, cancelRecharge].forEach(btn => {
+            if (btn) {
+                btn.addEventListener('click', () => this.closeRechargeModal());
+            }
+        });
+
+        // Close modal when clicking overlay
+        if (rechargeModal) {
+            rechargeModal.addEventListener('click', (e) => {
+                if (e.target === rechargeModal) {
+                    this.closeRechargeModal();
+                }
+            });
+        }
+
+        // Quick amount buttons
+        const amountButtons = document.querySelectorAll('.btn-amount');
+        amountButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const amount = btn.getAttribute('data-amount');
+                document.getElementById('rechargeAmount').value = amount;
+
+                // Update button states
+                amountButtons.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+            });
+        });
     }
 
     setupFormEventListeners() {
@@ -177,6 +230,26 @@ class ProfileManager {
             changePasswordForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 this.handlePasswordChange();
+            });
+        }
+
+        // Recharge form
+        const rechargeForm = document.getElementById('rechargeForm');
+        if (rechargeForm) {
+            rechargeForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleRecharge();
+            });
+        }
+
+        // Amount input change handler
+        const rechargeAmountInput = document.getElementById('rechargeAmount');
+        if (rechargeAmountInput) {
+            rechargeAmountInput.addEventListener('input', () => {
+                // Clear selected quick amount buttons when typing
+                document.querySelectorAll('.btn-amount').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
             });
         }
     }
@@ -225,6 +298,32 @@ class ProfileManager {
         }
     }
 
+    openRechargeModal() {
+        const modal = document.getElementById('rechargeModal');
+        const form = document.getElementById('rechargeForm');
+
+        // Reset form
+        if (form) form.reset();
+
+        // Clear selected amount buttons
+        document.querySelectorAll('.btn-amount').forEach(btn => {
+            btn.classList.remove('selected');
+        });
+
+        if (modal) {
+            modal.classList.add('show');
+            // Focus amount input
+            setTimeout(() => document.getElementById('rechargeAmount')?.focus(), 100);
+        }
+    }
+
+    closeRechargeModal() {
+        const modal = document.getElementById('rechargeModal');
+        if (modal) {
+            modal.classList.remove('show');
+        }
+    }
+
     async handlePersonalInfoUpdate() {
         const firstNameInput = document.getElementById('editFirstName');
         const lastNameInput = document.getElementById('editLastName');
@@ -246,7 +345,7 @@ class ProfileManager {
             const accessToken = localStorage.getItem('accessToken');
 
             const response = await fetch('/api/v1/users/update', {
-                method: 'PUT',
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${accessToken}`
@@ -270,7 +369,8 @@ class ProfileManager {
                 ...this.userData,
                 firstName: updatedUser.firstName,
                 lastName: updatedUser.lastName,
-                email: updatedUser.email
+                email: updatedUser.email,
+                balance: this.userData.balance
             };
 
             // Update localStorage
@@ -358,6 +458,77 @@ class ProfileManager {
             if (saveBtn) saveBtn.textContent = 'Change Password';
         }
     }
+
+    async handleRecharge() {
+        const amountInput = document.getElementById('rechargeAmount');
+        const rechargeBtn = document.getElementById('processRecharge');
+
+        const amount = parseFloat(amountInput?.value);
+
+        // Validation
+        if (!amount || amount < 1) {
+            this.showError('Please enter a valid amount (minimum $1.00).');
+            return;
+        }
+
+        // Disable form during submission
+        if (rechargeBtn) {
+            rechargeBtn.disabled = true;
+            rechargeBtn.textContent = 'Processing...';
+        }
+
+        try {
+            const accessToken = localStorage.getItem('accessToken');
+
+            const response = await fetch('/api/v1/users/recharge', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    userId: this.userData.id,
+                    amount: amount
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Failed to process recharge');
+            }
+
+            const result = await response.json();
+
+            // Use full updated user data from the backend
+            this.userData = result;
+
+            // Update localStorage
+            localStorage.setItem('userData', JSON.stringify(this.userData));
+
+            // Update display
+            this.displayUserData();
+
+            // Close modal and show success
+            this.closeRechargeModal();
+            this.showSuccess(`Account recharged successfully! Added ${this.formatCurrency(amount)}`);
+
+        } catch (error) {
+            console.error('Error processing recharge:', error);
+            this.showError(error.message || 'Failed to process recharge. Please try again.');
+        } finally {
+            // Re-enable form
+            if (rechargeBtn) {
+                rechargeBtn.disabled = false;
+                rechargeBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+                Recharge Account
+            `;
+            }
+        }
+    }
+
 
     logout() {
         if (confirm('Are you sure you want to logout?')) {
@@ -453,7 +624,8 @@ class ProfileManager {
                 id: userData.id,
                 email: userData.email,
                 firstName: userData.firstName,
-                lastName: userData.lastName
+                lastName: userData.lastName,
+                balance: userData.balance
             }));
 
             // Store tokens separately for security

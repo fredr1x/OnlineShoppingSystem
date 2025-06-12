@@ -1,14 +1,12 @@
 package online_shop.service;
 
 import lombok.RequiredArgsConstructor;
-import online_shop.dto.UserDto;
-import online_shop.dto.UserPasswordChangeDto;
-import online_shop.dto.UserUpdateDto;
-import online_shop.dto.UserUpdateRolesDto;
+import online_shop.dto.*;
 import online_shop.entity.Role;
 import online_shop.entity.User;
 import online_shop.entity.UserRoles;
 import online_shop.entity.enums.RoleValue;
+import online_shop.exception.IllegalAmountOfRechargeException;
 import online_shop.exception.PasswordConfirmationException;
 import online_shop.exception.UserNotFoundException;
 import online_shop.mapper.UserMapper;
@@ -18,9 +16,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -110,5 +110,22 @@ public class UserService {
         user.setModifiedAt(Instant.now());
 
         return userMapper.toDto(userRepository.save(user));
+    }
+
+    @Transactional
+    public UserDto rechargeBalance(RechargeBalanceDto rechargeBalanceDto) throws IllegalAmountOfRechargeException, UserNotFoundException {
+
+        var user = userRepository.findById(rechargeBalanceDto.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("User with id: " + rechargeBalanceDto.getUserId() + " not found"));
+
+        if (rechargeBalanceDto.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalAmountOfRechargeException("You can not add amount of money that less than 0");
+        }
+
+        user.setBalance(user.getBalance().add(rechargeBalanceDto.getAmount()));
+        user.setModifiedAt(Instant.now());
+        var saved = userRepository.save(user);
+
+        return userMapper.toDto(saved);
     }
 }

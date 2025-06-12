@@ -59,6 +59,7 @@ public class AuthenticationService {
         jwtResponse.setEmail(email);
         jwtResponse.setFirstName(user.getFirstName());
         jwtResponse.setLastName(user.getLastName());
+        jwtResponse.setBalance(user.getBalance());
         jwtResponse.setAccessToken(jwtTokenProvider.createAccessToken(userId, email, roles));
         jwtResponse.setRefreshToken(jwtTokenProvider.createRefreshToken(userId, email));
 

@@ -114,7 +114,8 @@ async function handleLogin(email, password) {
                 id: data.id,
                 email: data.email,
                 firstName: data.firstName,
-                lastName: data.lastName
+                lastName: data.lastName,
+                balance: data.balance
             };
             localStorage.setItem('userData', JSON.stringify(userData));
 

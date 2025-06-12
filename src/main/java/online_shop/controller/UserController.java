@@ -1,10 +1,8 @@
 package online_shop.controller;
 
 import lombok.RequiredArgsConstructor;
-import online_shop.dto.UserDto;
-import online_shop.dto.UserPasswordChangeDto;
-import online_shop.dto.UserUpdateDto;
-import online_shop.dto.UserUpdateRolesDto;
+import online_shop.dto.*;
+import online_shop.exception.IllegalAmountOfRechargeException;
 import online_shop.exception.PasswordConfirmationException;
 import online_shop.exception.UserNotFoundException;
 import online_shop.service.UserService;
@@ -53,4 +51,8 @@ public class UserController {
     }
 
     // todo add method for balance
+    @PatchMapping("/recharge")
+    public ResponseEntity<UserDto> rechargeBalance(@RequestBody @Validated RechargeBalanceDto rechargeBalanceDto) throws UserNotFoundException, IllegalAmountOfRechargeException {
+        return ResponseEntity.ok().body(userService.rechargeBalance(rechargeBalanceDto));
+    }
 }
