@@ -7,6 +7,7 @@ import java.time.Instant;
 
 @Data
 @Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "carts")
@@ -24,6 +25,9 @@ public class Cart {
 
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
+
+    @Column(name = "total_items", nullable = false)
+    private Integer totalItems;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

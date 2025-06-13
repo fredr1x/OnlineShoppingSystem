@@ -5,6 +5,7 @@ import lombok.*;
 
 @Data
 @Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "cart_items")

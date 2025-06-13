@@ -27,20 +27,21 @@ public class Product {
     @Column(name = "description", nullable = false)
     private String description;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false)
     private Category category;
 
     @Column(name = "price", nullable = false)
     private BigDecimal price;
 
-    @Column(name = "stock")
-    private Integer stock;
-
     @Column(name = "image_path", nullable = false)
     private String imagePath;
 
+    @Column(name = "stock")
+    private Integer stock;
+
     @Column(name = "rating")
-    private Integer rating;
+    private Float rating;
 
     @Column(name = "created_at")
     private Instant createdAt;

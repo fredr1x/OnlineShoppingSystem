@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @LiquibaseDataSource
+@EnableJpaRepositories
 public class OnlineShopSystemApplication {
 
     public static void main(String[] args) {

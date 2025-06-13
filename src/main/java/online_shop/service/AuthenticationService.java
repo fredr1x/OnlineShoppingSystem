@@ -4,18 +4,23 @@ import lombok.RequiredArgsConstructor;
 import online_shop.dto.JwtRequest;
 import online_shop.dto.JwtResponse;
 import online_shop.dto.UserDto;
+import online_shop.entity.Cart;
 import online_shop.entity.UserRoles;
+import online_shop.entity.WishList;
 import online_shop.exception.EmailAlreadyUsedException;
 import online_shop.exception.UserNotFoundException;
 import online_shop.mapper.UserMapper;
+import online_shop.repository.CartRepository;
 import online_shop.repository.RoleRepository;
 import online_shop.repository.UserRolesRepository;
+import online_shop.repository.WishListRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Service
@@ -26,7 +31,9 @@ public class AuthenticationService {
     private final UserService userService;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CartRepository cartRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final WishListRepository wishListRepository;
     private final UserRolesRepository userRolesRepository;
     private final AuthenticationManager authenticationManager;
 
@@ -34,7 +41,13 @@ public class AuthenticationService {
     public JwtResponse login(JwtRequest loginRequest) throws UserNotFoundException {
         JwtResponse jwtResponse = new JwtResponse();
         var authentication = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
-        authenticationManager.authenticate(authentication);
+
+        try {
+            authenticationManager.authenticate(authentication);
+        } catch (Exception e) {
+            throw new RuntimeException("Authentication failed: " + e.getMessage(), e);
+        }
+
 
         var user = userService.getUserByEmail(loginRequest.getEmail());
 
@@ -44,6 +57,9 @@ public class AuthenticationService {
 
         jwtResponse.setId(userId);
         jwtResponse.setEmail(email);
+        jwtResponse.setFirstName(user.getFirstName());
+        jwtResponse.setLastName(user.getLastName());
+        jwtResponse.setBalance(user.getBalance());
         jwtResponse.setAccessToken(jwtTokenProvider.createAccessToken(userId, email, roles));
         jwtResponse.setRefreshToken(jwtTokenProvider.createRefreshToken(userId, email));
 
@@ -74,6 +90,20 @@ public class AuthenticationService {
         user.setRegisteredAt(Instant.now());
 
         var saved = userService.save(user);
+
+        var cart = Cart.builder()
+                .user(saved)
+                .createdAt(Instant.now())
+                .totalPrice(BigDecimal.ZERO)
+                .build();
+
+        var wishList = WishList.builder()
+                .user(saved)
+                .build();
+
+        cartRepository.save(cart);
+        wishListRepository.save(wishList);
+
         return userMapper.toDto(saved);
     }
 }

@@ -2,11 +2,14 @@ package online_shop.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import online_shop.entity.enums.OrderStatus;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 
 @Data
 @Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "orders")
@@ -25,8 +28,9 @@ public class Order {
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 32)
-    private String status;
+    private OrderStatus status;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

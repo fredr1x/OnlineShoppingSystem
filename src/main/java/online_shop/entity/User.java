@@ -3,6 +3,7 @@ package online_shop.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -16,7 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Table(name = "users")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = {"cart", "wishList", "reviewList", "orders"})
+@ToString(exclude = {"cart", "wishList", "reviewList", "orders", "userRoles"})
 public class User {
 
     @Id
@@ -43,10 +44,13 @@ public class User {
     @Column(name = "modified_at")
     private Instant modifiedAt;
 
+    @Column(name = "balance", nullable = false)
+    private BigDecimal balance;
+
     @Column(name = "profile_image_path")
     private String profileImagePath;
 
-    @OneToOne(fetch = FetchType.EAGER, mappedBy = "user",
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user",
             cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
 
