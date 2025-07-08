@@ -17,12 +17,15 @@
     </parent>
 
     <properties>
-        <java.version>20</java.version>
+        <java.version>17</java.version>
         <postgresql.version>42.7.6</postgresql.version>
         <lombok.version>1.18.38</lombok.version>
         <dotenv.version>3.0.0</dotenv.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <jjwt.version>0.12.6</jjwt.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+
     </properties>
 
     <dependencies>
