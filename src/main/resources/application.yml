@@ -38,3 +38,9 @@ security:
     secret: ${JWT_SECRET}
     access: 3600000
     refresh: 2592000000
+
+minio:
+  url: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket: my-bucket

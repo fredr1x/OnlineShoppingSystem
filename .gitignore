@@ -6,6 +6,8 @@ target/
 
 .env
 **/.env
+application-dev.yml
+online-shop-system-0.0.1-SNAPSHOT.jar
 
 ### STS ###
 .apt_generated
