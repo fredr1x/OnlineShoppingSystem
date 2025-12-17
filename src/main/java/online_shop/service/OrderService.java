@@ -35,7 +35,7 @@ public class OrderService {
     private final OrderItemsRepository orderItemsRepository;
 
     @Transactional
-    public OrderDto makeOrder(OrderRequestDto orderRequestDto) throws CartIsEmptyException, IdMismatchException, UserNotFoundException {
+    public OrderDto makeOrder(OrderRequestDto orderRequestDto) {
 
         var user = userRepository.findById(orderRequestDto.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("User with id:" + orderRequestDto.getUserId() + " not found"));
@@ -91,7 +91,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderDto payOrder(Long userId, Long orderId) throws OrderNotFoundException, UserNotFoundException, InsufficientFundsException, IdMismatchException {
+    public OrderDto payOrder(Long userId, Long orderId) {
 
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
@@ -162,7 +162,7 @@ public class OrderService {
         return orderDtos;
     }
 
-    public OrderDto getOrderById(Long orderId) throws OrderNotFoundException {
+    public OrderDto getOrderById(Long orderId) {
         var order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order with id: " + orderId + " not found"));
 
@@ -191,7 +191,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void cancelOrder(Long orderId, Long userId) throws OrderNotFoundException, IdMismatchException, UserNotFoundException, OrderAlreadyCancelledOrReturnedException {
+    public void cancelOrder(Long orderId, Long userId) {
 
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));

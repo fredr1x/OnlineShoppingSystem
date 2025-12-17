@@ -1,5 +1,6 @@
 package online_shop.config;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import online_shop.security.JwtTokenFilter;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,6 +38,16 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
+                .anonymous(Customizer.withDefaults())
+                .authorizeHttpRequests(configurer ->
+                        configurer.requestMatchers("/api/v1/auth/**",
+                                        "/oauth2/**",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**",
+                                        "/error",
+                                        "/error/**")
+                                .permitAll()
+                                .anyRequest().authenticated())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(configurer ->
@@ -49,19 +61,6 @@ public class SecurityConfiguration {
                                             response.setStatus(HttpStatus.FORBIDDEN.value());
                                             response.getWriter().write("Unauthorized.");
                                         }))
-                .authorizeHttpRequests(configurer ->
-                        configurer.requestMatchers("/api/v1/auth/**")
-                                .permitAll()
-                                .requestMatchers("/oauth2/**")
-                                .permitAll()
-                                .requestMatchers("/swagger-ui/**")
-                                .permitAll()
-                                .requestMatchers("/v3/api-docs/**")
-                                .permitAll()
-                                .requestMatchers("/login.html", "/register.html", "/static/**", "css/**", "js/**", "/styles.css", "/login.js", "/profile.html", "/profile.js", "/profile.css")
-                                .permitAll()
-                                .anyRequest().authenticated())
-                .anonymous(AbstractHttpConfigurer::disable)
                 .oauth2Login(oauth -> oauth
                         .defaultSuccessUrl("/profile.html", true)
                         .successHandler(oAuth2SuccessHandler))

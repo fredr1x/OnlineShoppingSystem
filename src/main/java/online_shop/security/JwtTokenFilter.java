@@ -19,32 +19,37 @@ public class JwtTokenFilter extends GenericFilterBean {
     @Override
     @SneakyThrows
     public void doFilter(
-            final ServletRequest servletRequest,
-            final ServletResponse servletResponse,
-            final FilterChain filterChain) {
+            ServletRequest request,
+            ServletResponse response,
+            FilterChain filterChain
+    ) {
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String path = httpRequest.getRequestURI();
 
-        String bearerToken = ((HttpServletRequest) servletRequest).getHeader("Authorization");
+        System.out.println(path);
+        if (path.startsWith("/swagger-ui")
+            || path.startsWith("/v3/api-docs")
+            || path.startsWith("/api/v1/auth")
+            || path.startsWith("/oauth2")) {
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String bearerToken = httpRequest.getHeader("Authorization");
 
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             bearerToken = bearerToken.substring(7);
         }
 
-        try {
-            if (bearerToken != null
-                && jwtTokenProvider.isValid(bearerToken)) {
-                Authentication authentication
-                        = jwtTokenProvider.getAuthentication(bearerToken);
-                if (authentication != null) {
-                    SecurityContextHolder.getContext()
-                            .setAuthentication(authentication);
-                }
-            }
-        }
-        catch (Exception ignored) {
+        if (bearerToken != null && jwtTokenProvider.isValid(bearerToken)) {
+            Authentication authentication =
+                    jwtTokenProvider.getAuthentication(bearerToken);
 
+            SecurityContextHolder.getContext()
+                    .setAuthentication(authentication);
         }
 
-        filterChain.doFilter(servletRequest, servletResponse);
+        filterChain.doFilter(request, response);
     }
-
 }

@@ -136,6 +136,4 @@ public class ReviewService {
     private List<ReviewDto> getReviews(Long productId) {
         return reviewMapper.toDto(reviewRepository.findReviewsByProductId(productId));
     }
-
-
 }

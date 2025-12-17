@@ -1,12 +1,19 @@
-FROM alpine:latest
-
-RUN apk add openjdk17
-
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 WORKDIR /app
-COPY online-shop-system*.jar application.jar
-COPY application-dev.yml .
-COPY .env .
+
+COPY pom.xml .
+RUN mvn -B dependency:resolve dependency:resolve-plugins
+
+COPY src ./src
+
+RUN mvn -B clean package -DskipTests
+
+FROM eclipse-temurin:17-jdk-jammy
+WORKDIR /app
+
+COPY --from=builder /app/target/*.jar app.jar
+
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC"
 
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "application.jar"]
-CMD ["--spring.config.location=classpath:/application.yml,file:application-dev.yml"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

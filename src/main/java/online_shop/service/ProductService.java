@@ -11,9 +11,12 @@ import online_shop.entity.enums.Category;
 import online_shop.exception.ProductNotFoundException;
 import online_shop.mapper.ProductMapper;
 import online_shop.repository.ProductRepository;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -26,6 +29,7 @@ public class ProductService {
 
     private final ProductMapper productMapper;
     private final ProductRepository productRepository;
+    private final MinioService minioService;
 
     public ProductDto getProductById(Long id) throws ProductNotFoundException {
         return productMapper.toDto(productRepository
@@ -74,12 +78,26 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductDto addProduct(ProductDto product) {
+    public ProductDto addProduct(ProductDto product, MultipartFile image) {
 
         var entity = productMapper.toEntity(product);
         entity.setCreatedAt(Instant.now());
         entity.setRating(0.0F);
+
         var saved = productRepository.save(entity);
+
+        String imagePath = "products/%d/%s".formatted(
+                saved.getId(),
+                image.getOriginalFilename()
+        );
+
+        try {
+            minioService.uploadFile(imagePath, image);
+        } catch (Exception e) {
+            throw new IllegalStateException("Ошибка загрузки изображения", e);
+        }
+
+        saved.setImagePath(imagePath);
 
         return productMapper.toDto(saved);
     }
@@ -137,5 +155,15 @@ public class ProductService {
         existing.setDescription(dto.getDescription());
 
         return productMapper.toDto(productRepository.save(existing));
+    }
+
+    public InputStream getProductImage(Long productId) {
+        var entity = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Product with id: " + productId + "not found"));
+        try {
+            return minioService.downloadFile(entity.getImagePath());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to return product image");
+        }
     }
 }

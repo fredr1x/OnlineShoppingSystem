@@ -142,5 +142,4 @@ public class JwtTokenProvider {
                 .map(role -> role.getRole().getRoleValue().name())
                 .collect(Collectors.toList());
     }
-
 }

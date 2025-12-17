@@ -10,5 +10,4 @@ public class WishListItemDeleteDto {
     private Long wishListId;
 
     private Long wishListItemId;
-
 }

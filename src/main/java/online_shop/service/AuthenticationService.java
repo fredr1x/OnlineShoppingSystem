@@ -38,7 +38,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
 
-    public JwtResponse login(JwtRequest loginRequest) throws UserNotFoundException {
+    public JwtResponse login(JwtRequest loginRequest) {
         JwtResponse jwtResponse = new JwtResponse();
         var authentication = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
 
@@ -66,12 +66,12 @@ public class AuthenticationService {
         return jwtResponse;
     }
 
-    public JwtResponse refresh(String refreshToken) throws UserNotFoundException {
+    public JwtResponse refresh(String refreshToken) {
         return jwtTokenProvider.refreshUserTokens(refreshToken);
     }
 
     @Transactional
-    public UserDto registerUser(UserDto userDto) throws EmailAlreadyUsedException {
+    public UserDto registerUser(UserDto userDto) {
         var user = userMapper.toEntity(userDto);
 
         if (userService.existsByEmail(userDto.getEmail())) throw new EmailAlreadyUsedException("Email: " + userDto.getEmail() + " is already in use");

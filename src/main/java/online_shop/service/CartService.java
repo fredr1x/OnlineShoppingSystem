@@ -6,6 +6,7 @@ import online_shop.dto.CartItemDeleteDto;
 import online_shop.dto.CartItemDto;
 import online_shop.entity.Cart;
 import online_shop.entity.CartItem;
+import online_shop.entity.User;
 import online_shop.exception.CartItemNotFound;
 import online_shop.exception.ProductNotFoundException;
 import online_shop.exception.UserNotFoundException;
@@ -15,6 +16,7 @@ import online_shop.repository.CartItemRepository;
 import online_shop.repository.CartRepository;
 import online_shop.repository.ProductRepository;
 import online_shop.repository.UserRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,22 +43,25 @@ public class CartService {
         return cartItemRepository.getTotalItems(cartId);
     }
 
+    public List<CartItemDto> getCartItems(Long userId) {
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
+
+        var cart = user.getCart();
+
+        return cartItemRepository.findAllByCartId(cart.getId()).stream()
+                .map(cartItemMapper::toDto)
+                .toList();
+    }
+
     @Transactional
     public List<CartItemDto> addCartItem(CartItemDto cartItemDto) throws UserNotFoundException, ProductNotFoundException {
         var userId = cartItemDto.getUserId();
 
-        var user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
 
         var cart = cartRepository.findByUserId(userId);
-        if (cart == null) {
-            var toSave = Cart.builder()
-                    .user(user)
-                    .createdAt(Instant.now())
-                    .build();
-
-            cart = cartRepository.save(toSave);
-        }
 
         var product = productRepository.findById(cartItemDto.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException("Product with id: " + cartItemDto.getProductId() + " not found"));

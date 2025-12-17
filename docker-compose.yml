@@ -5,9 +5,22 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8090:8080"
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/online_shop
+      DB_USERNAME: postgres
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      MINIO_URL: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: profile-photos
+
+    depends_on:
+      - postgres
+      - minio
     networks:
-      backend:
+      - backend
 
   minio:
     image: quay.io/minio/minio:latest
@@ -21,21 +34,20 @@ services:
     volumes:
       - minio-storage:/data
     networks:
-      backend:
+      - backend
 
   postgres:
     image: postgres:latest
     ports:
       - "5442:5432"
     environment:
-      DB_URL: jdbc:postgresql://postgres:5432/online_shop
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: online_shop
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
-      backend:
+      - backend
 
 volumes:
   minio-storage:

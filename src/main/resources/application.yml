@@ -8,7 +8,7 @@ spring:
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
     enabled: true
-
+    clear-checksums: true
 
   jpa:
     hibernate:
@@ -44,3 +44,6 @@ minio:
   access-key: minioadmin
   secret-key: minioadmin
   bucket: my-bucket
+server:
+  address: 0.0.0.0
+  port: 8080
