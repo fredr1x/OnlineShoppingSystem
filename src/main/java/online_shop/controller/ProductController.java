@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import online_shop.dto.ProductCategoryDto;
 import online_shop.dto.ProductDto;
 import online_shop.dto.ProductPriceDto;
 import online_shop.dto.ProductStockDto;
@@ -117,12 +116,7 @@ public class ProductController {
     })
     @GetMapping("/category")
     public ResponseEntity<List<ProductDto>> getAllProductsByCategory(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Категория товара",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = ProductCategoryDto.class))
-            )
-            @RequestBody @Validated ProductCategoryDto category
+            @RequestParam String category
     ) {
         return ResponseEntity.ok(productService.getAllProductsByCategory(category));
     }
@@ -165,7 +159,7 @@ public class ProductController {
             @RequestParam(required = false) BigDecimal maxPrice,
 
             @Parameter(description = "Категория товара")
-            @RequestParam(required = false) ProductCategoryDto category
+            @RequestParam(required = false) String category
     ) {
         return ResponseEntity.ok(productService.filter(ratingAbove, minPrice, maxPrice, category));
     }

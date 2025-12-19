@@ -200,8 +200,7 @@ public class UserController {
                     required = true,
                     content = @Content(schema = @Schema(implementation = RechargeBalanceDto.class))
             )
-            @RequestBody @Validated RechargeBalanceDto rechargeBalanceDto
-    ) throws UserNotFoundException, IllegalAmountOfRechargeException {
+            @RequestBody @Validated RechargeBalanceDto rechargeBalanceDto) {
 
         return ResponseEntity.ok(userService.rechargeBalance(rechargeBalanceDto));
     }

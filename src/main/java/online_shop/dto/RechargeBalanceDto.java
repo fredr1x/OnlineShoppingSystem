@@ -16,5 +16,4 @@ public class RechargeBalanceDto {
     @Min(value = 10)
     @NotNull
     private BigDecimal amount;
-
 }

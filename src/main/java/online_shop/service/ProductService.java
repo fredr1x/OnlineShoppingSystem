@@ -2,7 +2,6 @@ package online_shop.service;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
-import online_shop.dto.ProductCategoryDto;
 import online_shop.dto.ProductDto;
 import online_shop.dto.ProductPriceDto;
 import online_shop.dto.ProductStockDto;
@@ -11,7 +10,6 @@ import online_shop.entity.enums.Category;
 import online_shop.exception.ProductNotFoundException;
 import online_shop.mapper.ProductMapper;
 import online_shop.repository.ProductRepository;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,10 +35,10 @@ public class ProductService {
                 .orElseThrow(() -> new ProductNotFoundException("Product with id: " + id + " not found")));
     }
 
-    public List<ProductDto> getAllProductsByCategory(ProductCategoryDto category) {
+    public List<ProductDto> getAllProductsByCategory(String category) {
         return productMapper
                 .toDto(productRepository
-                        .findByCategory(Category.valueOf(category.getCategory().toUpperCase())));
+                        .findByCategory(Category.valueOf(category)));
     }
 
     public List<ProductDto> getTop10Products() {
@@ -51,7 +49,7 @@ public class ProductService {
         return productMapper.toDto(productRepository.searchByKeyword(keyword));
     }
 
-    public List<ProductDto> filter(Float ratingAbove, BigDecimal minPrice, BigDecimal maxPrice, ProductCategoryDto category) {
+    public List<ProductDto> filter(Float ratingAbove, BigDecimal minPrice, BigDecimal maxPrice, String category) {
         List<Product> products = productRepository.findAll((root, query, cb) -> {
            List<Predicate> predicates = new ArrayList<>();
 
@@ -68,7 +66,7 @@ public class ProductService {
            }
 
            if (category != null) {
-               predicates.add(cb.equal(root.get("category"), Category.valueOf(category.getCategory())));
+               predicates.add(cb.equal(root.get("category"), Category.valueOf(category)));
            }
 
             return cb.and(predicates.toArray(new Predicate[0]));
@@ -79,28 +77,34 @@ public class ProductService {
 
     @Transactional
     public ProductDto addProduct(ProductDto product, MultipartFile image) {
+        if (image == null || image.isEmpty()) {
+            throw new IllegalArgumentException("Image is required");
+        }
 
         var entity = productMapper.toEntity(product);
         entity.setCreatedAt(Instant.now());
         entity.setRating(0.0F);
 
+        String tempImagePath = "products/tmp/%s".formatted(image.getOriginalFilename());
+        entity.setImagePath(tempImagePath);
+
         var saved = productRepository.save(entity);
 
-        String imagePath = "products/%d/%s".formatted(
+        String finalImagePath = "products/%d/%s".formatted(
                 saved.getId(),
                 image.getOriginalFilename()
         );
 
         try {
-            minioService.uploadFile(imagePath, image);
+            minioService.uploadFile(finalImagePath, image);
         } catch (Exception e) {
             throw new IllegalStateException("Ошибка загрузки изображения", e);
         }
 
-        saved.setImagePath(imagePath);
-
+        saved.setImagePath(finalImagePath);
         return productMapper.toDto(saved);
     }
+
 
     @Transactional
     public ProductStockDto changeStock(ProductStockDto productStock) throws ProductNotFoundException {

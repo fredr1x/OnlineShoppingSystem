@@ -29,7 +29,8 @@ public class JwtTokenFilter extends GenericFilterBean {
         System.out.println(path);
         if (path.startsWith("/swagger-ui")
             || path.startsWith("/v3/api-docs")
-            || path.startsWith("/api/v1/auth")
+            || path.startsWith("/api/v1/auth/login")
+            || path.startsWith("/api/v1/auth/register")
             || path.startsWith("/oauth2")) {
 
             filterChain.doFilter(request, response);

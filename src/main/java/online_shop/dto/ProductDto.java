@@ -38,7 +38,6 @@ public class ProductDto {
     private Integer stock;
 
     @JsonProperty(value = "image_path")
-    @NotNull(message = "image path must be not null", groups = {OnCreate.class})
     private String imagePath;
 
     @Nullable()

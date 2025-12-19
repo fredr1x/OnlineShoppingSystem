@@ -85,4 +85,3 @@ public class AuthenticationController {
         return authenticationService.refresh(refreshToken);
     }
 }
-

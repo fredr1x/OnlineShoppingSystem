@@ -1,4 +1,4 @@
-ALTER TABLE products DROP CONSTRAINT products_category_check;
+ALTER TABLE products DROP CONSTRAINT IF EXISTS products_category_check;
 
 ALTER TABLE products
 ALTER COLUMN category
